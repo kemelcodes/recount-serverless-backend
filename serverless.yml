@@ -1,0 +1,45 @@
+org: kemelcodes
+app: recount
+service: recount-crawler-service
+
+frameworkVersion: '2'
+
+plugins:
+  - serverless-webpack
+  - serverless-dotenv-plugin
+provider:
+  name: aws
+  timeout: 120
+  memorySize: 1536
+  runtime: nodejs12.x
+  lambdaHashingVersion: 20201221
+
+functions:
+  hello:
+    handler: src/index.handler
+    environment:
+      DEBUG: 1
+      SLS_DEBUG: '*'
+
+package:
+  individually: true
+  exclude:
+    - node_modules/puppeteer/.local-chromium/**
+
+# serverless-webpack configuration
+# Enable auto-packing of external modules
+custom:
+  chrome:
+    flags:
+      - --window-size=1280,1696
+      - --hidescrollbars
+      - --ignore-certificate-errors
+    functions:
+      - handler
+  webpack:
+    webpackConfig: webpack.config.js 
+    includeModules: true
+
+# custom environment variables
+environment:
+  SLS_DEBUG: ${env:SLS_DEBUG}
